@@ -3,7 +3,7 @@
 CC = gcc
 CFLAGS = -Wall -O2 -Isrc/include
 SRC = src
-OBJ = $(SRC)/resonator.o $(SRC)/main.o
+OBJ = $(SRC)/resonator.o $(SRC)/transmon.o $(SRC)/main.o
 TARGET = bin/resonator_test
 
 all: $(TARGET)
