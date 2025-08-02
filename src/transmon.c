@@ -1,6 +1,6 @@
 // transmon.c
 #include "transmon.h"
-
+#include <math.h>
 Transmon* crea_transmon(double C, double E_J) {
     Transmon* t = (Transmon*) malloc(sizeof(Transmon));
     if (!t) return NULL;
