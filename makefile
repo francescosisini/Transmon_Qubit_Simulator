@@ -1,7 +1,8 @@
 # Makefile per Transmon_Qubit_Simulator
 
-CC = gcc -lm
-CFLAGS = -Wall -O2 -Isrc/include 
+CC = gcc
+CFLAGS = -Wall -O2 -Isrc/include
+LDFLAGS = -lm
 SRC = src
 OBJ = $(SRC)/resonator.o $(SRC)/transmon.o $(SRC)/main.o
 TARGET = bin/resonator_test
@@ -10,7 +11,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@mkdir -p bin
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(SRC)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
