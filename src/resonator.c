@@ -2,6 +2,7 @@
 #include "resonator.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 Resonator* crea_risonatore_LC(double L, double C, double Q) {
     Resonator* r = (Resonator*) malloc(sizeof(Resonator));
     if (!r) return NULL;
