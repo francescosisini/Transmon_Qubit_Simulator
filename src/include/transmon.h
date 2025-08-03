@@ -6,23 +6,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Costanti fisiche
-#define PI 3.141592653589793
-#define HBAR 1.0545718e-34
-#define E_CHARGE 1.60217662e-19
+// Nodo elettrico (riutilizzato)
+typedef struct {
+    int id;
+    const char* nome;
+} NodoElettrico;
 
 // Struttura dati per il transmon
 typedef struct {
-    double E_C;     // Energia di carica (Joule)
-    double E_J;     // Energia di Josephson (Joule)
-    double freq_q;  // Frequenza del qubit (rad/s)
-    double alpha;   // Anarmonicita (rad/s)
+    NodoElettrico* nodo_A;  // Nodo iniziale
+    NodoElettrico* nodo_B;  // Nodo finale
+    double C;         // Capacita in Farad
+    double EJ;        // Energia di Josephson in Joule
+    double EC;        // Energia di carica in Joule
+    double omega_q;   // Frequenza del qubit in rad/s
+    double alpha;     // Anarmonicita in rad/s
 } Transmon;
 
-// Crea un transmon dato C e E_J
-Transmon* crea_transmon(double C, double E_J);
+// Funzione per creare un transmon
+Transmon* crea_transmon(double C, double EJ, NodoElettrico* nodo_A, NodoElettrico* nodo_B);
 
-// Stampa i parametri principali del transmon
+// Funzione per stampare i parametri del transmon
 void stampa_transmon(const Transmon* t);
 
 #endif
