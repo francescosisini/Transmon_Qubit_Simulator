@@ -6,16 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "nodo.h"
+
 // Costanti fisiche
 #define PI 3.141592653589793
 #define HBAR 1.0545718e-34
 #define E_CHARGE 1.60217662e-19
 
-// Nodo elettrico
-typedef struct {
-    int id;
-    const char* nome;
-} NodoElettrico;
+
 
 // Struttura dati per il risonatore
 typedef struct {
