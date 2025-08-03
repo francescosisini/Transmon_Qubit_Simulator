@@ -1,36 +1,26 @@
 // main.c
+#include <stdio.h>
 #include "resonator.h"
 #include "transmon.h"
 
 int main() {
-    // --- Risonatore ---
-    double L = 10e-9;     // 10 nH
-    double C_r = 100e-15; // 100 fF
-    double Q = 10000.0;
+    // Creazione dei nodi elettrici
+    NodoElettrico nodo1 = { .id = 1, .nome = "A" };
+    NodoElettrico nodo2 = { .id = 2, .nome = "B" };
+    NodoElettrico nodo3 = { .id = 3, .nome = "C" };
+    NodoElettrico nodo4 = { .id = 4, .nome = "D" };
 
-    Resonator* r = crea_risonatore_LC(L, C_r, Q);
-    if (!r) {
-        fprintf(stderr, "Errore nella creazione del risonatore.\n");
-        return 1;
-    }
-
+    // Creazione di un risonatore LC tra A e B
+    Resonator* r = crea_risonatore_LC(1e-9, 1e-12, 1000.0, &nodo1, &nodo2);
     stampa_risonatore(r);
 
-    // --- Transmon ---
-    double C_q = 80e-15;     // 80 fF
-    double EJ = 20e-24;      // 20 aJoule (≈ 125 GHz * hbar)
-
-    Transmon* t = crea_transmon(C_q, EJ);
-    if (!t) {
-        fprintf(stderr, "Errore nella creazione del transmon.\n");
-        free(r);
-        return 1;
-    }
-
+    // Creazione di un transmon tra C e D
+    Transmon* t = crea_transmon(1e-12, 1e-22, &nodo3, &nodo4);
     stampa_transmon(t);
 
-    // --- Cleanup ---
+    // Liberazione della memoria
     free(r);
     free(t);
+
     return 0;
 }
