@@ -6,11 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Nodo elettrico (riutilizzato)
-typedef struct {
-    int id;
-    const char* nome;
-} NodoElettrico;
+#include "nodo.h"
+
 
 // Struttura dati per il transmon
 typedef struct {
