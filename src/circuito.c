@@ -1,0 +1,49 @@
+// circuito.c
+#include <stdio.h>
+#include <stdlib.h>
+#include "circuito.h"
+
+CircuitoElettronico* crea_circuito() {
+    CircuitoElettronico* c = malloc(sizeof(CircuitoElettronico));
+    if (!c) return NULL;
+    c->nodi = NULL; c->num_nodi = 0;
+    c->risonatori = NULL; c->num_risonatori = 0;
+    c->transmon = NULL; c->num_transmon = 0;
+    return c;
+}
+
+void aggiungi_nodo(CircuitoElettronico* c, NodoElettrico* n) {
+    c->nodi = realloc(c->nodi, (c->num_nodi + 1) * sizeof(NodoElettrico*));
+    c->nodi[c->num_nodi++] = n;
+}
+
+void aggiungi_risonatore(CircuitoElettronico* c, Resonator* r) {
+    c->risonatori = realloc(c->risonatori, (c->num_risonatori + 1) * sizeof(Resonator*));
+    c->risonatori[c->num_risonatori++] = r;
+}
+
+void aggiungi_transmon(CircuitoElettronico* c, Transmon* t) {
+    c->transmon = realloc(c->transmon, (c->num_transmon + 1) * sizeof(Transmon*));
+    c->transmon[c->num_transmon++] = t;
+}
+
+void stampa_topologia(const CircuitoElettronico* c) {
+    printf("\nTopologia del circuito:\n");
+    for (int i = 0; i < c->num_nodi; i++) {
+        printf("Nodo %d: %s\n", c->nodi[i]->id, c->nodi[i]->nome);
+    }
+    for (int i = 0; i < c->num_risonatori; i++) {
+        stampa_risonatore(c->risonatori[i]);
+    }
+    for (int i = 0; i < c->num_transmon; i++) {
+        stampa_transmon(c->transmon[i]);
+    }
+}
+
+void libera_circuito(CircuitoElettronico* c) {
+    if (!c) return;
+    free(c->nodi);
+    free(c->risonatori);
+    free(c->transmon);
+    free(c);
+}
