@@ -1,5 +1,6 @@
 // main.c
 #include <stdio.h>
+#include "nodo.h"
 #include "resonator.h"
 #include "transmon.h"
 
