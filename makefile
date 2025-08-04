@@ -1,20 +1,22 @@
-# Makefile per Transmon_Qubit_Simulator
-
 CC = gcc
-CFLAGS = -Wall -O2 -Isrc/include
-LDFLAGS = -lm
-SRC = src
-OBJ = $(SRC)/resonator.o $(SRC)/transmon.o $(SRC)/main.o
-TARGET = bin/resonator_test
+CFLAGS = -Wall -lm -I./src/include
 
-all: $(TARGET)
+SRC = \
+	main.c \
+	src/analisi_dc.c \
+	src/circuito.c \
+	src/nodo.c \
+	src/resistor.c \
+	src/generator.c \
+	src/transmon.c \
+	src/resonator.c
 
-$(TARGET): $(OBJ)
-	@mkdir -p bin
-	$(CC) -o $@ $^ $(LDFLAGS)
+OBJ = $(SRC:.c=.o)
 
-$(SRC)/%.o: $(SRC)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+all: simulatore
+
+simulatore: $(OBJ)
+	$(CC) $(CFLAGS) -o simulatore $(SRC)
 
 clean:
-	rm -f $(SRC)/*.o $(TARGET)
+	rm -f simulatore *.o src/*.o
