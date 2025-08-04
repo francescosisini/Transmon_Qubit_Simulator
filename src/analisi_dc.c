@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 #include "analisi_dc.h"
 #include "resistor.h"
 #include "generator.h"
@@ -7,83 +8,97 @@
 #include "nodo.h"
 
 #define MAX_NODI 100
+#define MAX_EQUAZIONI (MAX_NODI + 100)
 
 static double tensioni_nodi[MAX_NODI] = {0};
 
 void risolvi_dc(CircuitoElettronico* c) {
     int n = c->num_nodi;
-    double G[MAX_NODI][MAX_NODI] = {0};
-    double I[MAX_NODI] = {0};
+    int m = c->num_generatori; // numero generatori DC
+    int dim = n + m; // dimensione del sistema aumentato
 
-    // Costruzione matrice di conduttanza G
+    double A[MAX_EQUAZIONI][MAX_EQUAZIONI] = {0};
+    double b[MAX_EQUAZIONI] = {0};
+
+    // Costruzione matrice di conduttanza G (n x n)
     for (int i = 0; i < c->num_resistors; i++) {
         Resistor* r = c->resistors[i];
         int a = r->nodoA->id;
-        int b = r->nodoB->id;
+        int b_ = r->nodoB->id;
         double g = 1.0 / r->resistenza;
         if (a >= 0) {
-            G[a][a] += g;
-            if (b >= 0) G[a][b] -= g;
+            A[a][a] += g;
+            if (b_ >= 0) A[a][b_] -= g;
         }
-        if (b >= 0) {
-            G[b][b] += g;
-            if (a >= 0) G[b][a] -= g;
+        if (b_ >= 0) {
+            A[b_][b_] += g;
+            if (a >= 0) A[b_][a] -= g;
         }
     }
 
-    // Correnti iniettate da generatori DC
-    for (int i = 0; i < c->num_generatori; i++) {
-        Generatore* g = c->generatori[i];
+    // Gestione generatori di tensione ideali
+    for (int k = 0; k < m; k++) {
+        Generatore* g = c->generatori[k];
         if (g->tipo != GENERATORE_DC) continue;
+
         int pos = g->nodo_pos->id;
         int neg = g->nodo_neg->id;
-        double v = g->valore;
-        if (pos >= 0) I[pos] += v;
-        if (neg >= 0) I[neg] -= v;
+        int riga = n + k;
+
+        if (pos >= 0) {
+            A[riga][pos] = 1.0;
+            A[pos][riga] = 1.0;
+        }
+        if (neg >= 0) {
+            A[riga][neg] = -1.0;
+            A[neg][riga] = -1.0;
+        }
+        b[riga] = g->valore;
     }
 
-    // Vincola il nodo 0 (massa) a 0V
-    for (int i = 0; i < n; i++) {
-        G[0][i] = 0.0;
-    }
-    G[0][0] = 1.0;
-    I[0] = 0.0;
+    // Vincola massa a 0V
+    for (int i = 0; i < dim; i++) A[0][i] = 0.0;
+    A[0][0] = 1.0;
+    b[0] = 0.0;
 
-    // DEBUG: stampa G e I
-    printf("\nMatrice G:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%10.3e ", G[i][j]);
+    // DEBUG: stampa matrice A e vettore b
+    printf("\nMatrice A:\n");
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            printf("%10.3e ", A[i][j]);
         }
         printf("\n");
     }
-
-    printf("\nVettore I:\n");
-    for (int i = 0; i < n; i++) {
-        printf("%10.3e\n", I[i]);
+    printf("\nVettore b:\n");
+    for (int i = 0; i < dim; i++) {
+        printf("%10.3e\n", b[i]);
     }
 
     // Eliminazione in avanti (Gauss)
-    for (int i = 0; i < n; i++) {
-        for (int k = i + 1; k < n; k++) {
-            if (fabs(G[i][i]) < 1e-12) continue;
-            double f = G[k][i] / G[i][i];
-            for (int j = i; j < n; j++) G[k][j] -= f * G[i][j];
-            I[k] -= f * I[i];
+    for (int i = 0; i < dim; i++) {
+        for (int k = i + 1; k < dim; k++) {
+            if (fabs(A[i][i]) < 1e-12) continue;
+            double f = A[k][i] / A[i][i];
+            for (int j = i; j < dim; j++) A[k][j] -= f * A[i][j];
+            b[k] -= f * b[i];
         }
     }
 
     // Sostituzione all'indietro
-    for (int i = n - 1; i >= 0; i--) {
-        if (fabs(G[i][i]) < 1e-12) {
-            printf("Errore: G[%d][%d] = 0, salto il nodo\n", i, i);
-            tensioni_nodi[i] = 0.0;
+    double x[MAX_EQUAZIONI] = {0};
+    for (int i = dim - 1; i >= 0; i--) {
+        if (fabs(A[i][i]) < 1e-12) {
+            printf("Errore: A[%d][%d] = 0\n", i, i);
+            x[i] = 0.0;
             continue;
         }
-        tensioni_nodi[i] = I[i];
-        for (int j = i + 1; j < n; j++) tensioni_nodi[i] -= G[i][j] * tensioni_nodi[j];
-        tensioni_nodi[i] /= G[i][i];
+        x[i] = b[i];
+        for (int j = i + 1; j < dim; j++) x[i] -= A[i][j] * x[j];
+        x[i] /= A[i][i];
     }
+
+    // Salva le tensioni nei nodi
+    for (int i = 0; i < n; i++) tensioni_nodi[i] = x[i];
 }
 
 double get_tensione_nodo(NodoElettrico* nodo) {
