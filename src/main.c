@@ -1,31 +1,35 @@
-// main.c
+// main.c – Esempio base con circuito resistivo e generatore DC
 #include <stdio.h>
 #include "circuito.h"
 #include "resistor.h"
 #include "generator.h"
 #include "analisi_dc.h"
+#include "nodo.h"
 
 int main() {
-    CircuitoElettronico circuito = crea_circuito();
+    // Creazione circuito
+    CircuitoElettronico* circuito = crea_circuito();
 
-    // Nodo 0 = massa, Nodo 1 = nodo positivo del generatore e della resistenza
-    NodoElettrico* massa = aggiungi_nodo(&circuito); // id 0
-    NodoElettrico* nodo1 = aggiungi_nodo(&circuito); // id 1
+    // Creazione nodi
+    NodoElettrico* massa = crea_nodo(0);
+    NodoElettrico* nodo1 = crea_nodo(1);
 
-    // Generatore DC da 5V: da massa (negativo) a nodo1 (positivo)
-    Generatore* gen = crea_generatore(GENERATORE_DC, 5.0, nodo1, massa);
-    aggiungi_generatore(&circuito, gen);
+    aggiungi_nodo(circuito, massa);
+    aggiungi_nodo(circuito, nodo1);
 
-    // Resistenza da 1k Ohm tra nodo1 e massa
-    Resistor* res = crea_resistor(1000.0, nodo1, massa);
-    aggiungi_resistor(&circuito, res);
+    // Generatore DC 5V tra nodo1 e massa
+    Generatore* gen = crea_generatore("V1", GENERATORE_DC, 5.0, 0.0, 0.0, nodo1, massa);
+    aggiungi_generatore(circuito, gen);
 
-    // Analisi DC
-    risolvi_dc(&circuito);
+    // Resistenza da 1000 ohm tra nodo1 e massa
+    Resistor* res = crea_resistor("R1", 1000.0, nodo1, massa);
+    aggiungi_resistor(circuito, res);
 
-    // Stampa risultati
-    printf("Tensione nodo 0 (massa): %.2f V\n", get_tensione_nodo(massa));
-    printf("Tensione nodo 1: %.2f V\n", get_tensione_nodo(nodo1));
+    // Analisi in DC
+    risolvi_dc(circuito);
+
+    // Output
+    printf("Tensione nodo1: %.2f V\n", get_tensione_nodo(nodo1));
     printf("Corrente nella resistenza: %.6f A\n", get_corrente_resistenza(res));
 
     return 0;
