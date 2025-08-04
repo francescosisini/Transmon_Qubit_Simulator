@@ -11,6 +11,8 @@ CircuitoElettronico* crea_circuito() {
     c->transmon = NULL; c->num_transmon = 0;
     c->condensatori = NULL; c->num_condensatori = 0;
     c->coassiali = NULL; c->num_coassiali = 0;
+    c->resistors = NULL; c->num_resistors = 0;
+    c->generatori = NULL; c->num_generatori = 0;
     return c;
 }
 
@@ -39,6 +41,17 @@ void aggiungi_coassiale(CircuitoElettronico* c, CoaxialCable* cavo) {
     c->coassiali[c->num_coassiali++] = cavo;
 }
 
+// Nuove implementazioni mancanti
+void aggiungi_resistor(CircuitoElettronico* c, Resistor* res) {
+    c->resistors = realloc(c->resistors, (c->num_resistors + 1) * sizeof(Resistor*));
+    c->resistors[c->num_resistors++] = res;
+}
+
+void aggiungi_generatore(CircuitoElettronico* c, Generatore* gen) {
+    c->generatori = realloc(c->generatori, (c->num_generatori + 1) * sizeof(Generatore*));
+    c->generatori[c->num_generatori++] = gen;
+}
+
 void stampa_topologia(const CircuitoElettronico* c) {
     printf("\nTopologia del circuito:\n");
     for (int i = 0; i < c->num_nodi; i++) {
@@ -56,6 +69,12 @@ void stampa_topologia(const CircuitoElettronico* c) {
     for (int i = 0; i < c->num_coassiali; i++) {
         stampa_coaxial(c->coassiali[i]);
     }
+    for (int i = 0; i < c->num_resistors; i++) {
+        stampa_resistor(c->resistors[i]);
+    }
+    for (int i = 0; i < c->num_generatori; i++) {
+        stampa_generatore(c->generatori[i]);
+    }
 }
 
 void libera_circuito(CircuitoElettronico* c) {
@@ -65,5 +84,7 @@ void libera_circuito(CircuitoElettronico* c) {
     free(c->transmon);
     free(c->condensatori);
     free(c->coassiali);
+    free(c->resistors);
+    free(c->generatori);
     free(c);
 }
