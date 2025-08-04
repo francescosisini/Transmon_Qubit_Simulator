@@ -14,13 +14,13 @@ static double tensioni_nodi[MAX_NODI] = {0};
 
 void risolvi_dc(CircuitoElettronico* c) {
     int n = c->num_nodi;
-    int m = c->num_generatori; // numero generatori DC
-    int dim = n + m; // dimensione del sistema aumentato
+    int m = c->num_generatori;
+    int dim = n + m;
 
     double A[MAX_EQUAZIONI][MAX_EQUAZIONI] = {0};
     double b[MAX_EQUAZIONI] = {0};
 
-    // Costruzione matrice di conduttanza G (n x n)
+    // Costruzione matrice G da resistenze
     for (int i = 0; i < c->num_resistors; i++) {
         Resistor* r = c->resistors[i];
         int a = r->nodoA->id;
@@ -36,48 +36,36 @@ void risolvi_dc(CircuitoElettronico* c) {
         }
     }
 
-    // Gestione generatori di tensione ideali
+    // Aggiunta generatori DC usando MNA
     for (int k = 0; k < m; k++) {
         Generatore* g = c->generatori[k];
         if (g->tipo != GENERATORE_DC) continue;
 
         int pos = g->nodo_pos->id;
         int neg = g->nodo_neg->id;
-        int riga = n + k;
+        int eq = n + k; // equazione extra per il generatore
 
+        // Equazione KVL
         if (pos >= 0) {
-            A[riga][pos] = 1.0;
-            A[pos][riga] = 1.0;
+            A[eq][pos] = 1.0;
+            A[pos][eq] = 1.0;
         }
         if (neg >= 0) {
-            A[riga][neg] = -1.0;
-            A[neg][riga] = -1.0;
+            A[eq][neg] = -1.0;
+            A[neg][eq] = -1.0;
         }
-        b[riga] = g->valore;
+        b[eq] = g->valore;
     }
 
-    // Vincola massa a 0V
-    for (int i = 0; i < dim; i++) A[0][i] = 0.0;
+    // Vincola il nodo 0 (massa) a 0V
+    for (int j = 0; j < dim; j++) A[0][j] = 0.0;
     A[0][0] = 1.0;
     b[0] = 0.0;
 
-    // DEBUG: stampa matrice A e vettore b
-    printf("\nMatrice A:\n");
+    // Eliminazione di Gauss
     for (int i = 0; i < dim; i++) {
-        for (int j = 0; j < dim; j++) {
-            printf("%10.3e ", A[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\nVettore b:\n");
-    for (int i = 0; i < dim; i++) {
-        printf("%10.3e\n", b[i]);
-    }
-
-    // Eliminazione in avanti (Gauss)
-    for (int i = 0; i < dim; i++) {
+        if (fabs(A[i][i]) < 1e-12) continue;
         for (int k = i + 1; k < dim; k++) {
-            if (fabs(A[i][i]) < 1e-12) continue;
             double f = A[k][i] / A[i][i];
             for (int j = i; j < dim; j++) A[k][j] -= f * A[i][j];
             b[k] -= f * b[i];
@@ -97,7 +85,6 @@ void risolvi_dc(CircuitoElettronico* c) {
         x[i] /= A[i][i];
     }
 
-    // Salva le tensioni nei nodi
     for (int i = 0; i < n; i++) tensioni_nodi[i] = x[i];
 }
 
