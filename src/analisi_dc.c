@@ -42,6 +42,13 @@ void risolvi_dc(CircuitoElettronico* c) {
         if (neg >= 0) I[neg] -= v;
     }
 
+    // Vincola il nodo 0 (massa) a 0V
+    for (int i = 0; i < n; i++) {
+        G[0][i] = 0.0;
+    }
+    G[0][0] = 1.0;
+    I[0] = 0.0;
+
     // Eliminazione in avanti (Gauss)
     for (int i = 0; i < n; i++) {
         for (int k = i + 1; k < n; k++) {
