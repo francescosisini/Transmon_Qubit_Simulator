@@ -11,12 +11,10 @@ SRC = \
 	src/transmon.c \
 	src/resonator.c
 
-OBJ = $(SRC:.c=.o)
-
 all: simulatore
 
-simulatore: $(OBJ)
+simulatore:
 	$(CC) $(CFLAGS) -o simulatore $(SRC)
 
 clean:
-	rm -f simulatore *.o src/*.o
+	rm -f simulatore
