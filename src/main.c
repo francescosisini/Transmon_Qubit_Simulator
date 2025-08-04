@@ -18,7 +18,7 @@ int main() {
     aggiungi_nodo(circuito, nodo1);
 
     // Generatore DC 5V tra nodo1 e massa
-    Generatore* gen = crea_generatore("V1", GENERATORE_DC, 5.0, 0.0, 0.0, nodo1, massa);
+    Generatore* gen = crea_generatore("V1", GENERATORE_DC, 5.0, 0.0, nodo1, massa);
     aggiungi_generatore(circuito, gen);
 
     // Resistenza da 1000 ohm tra nodo1 e massa
