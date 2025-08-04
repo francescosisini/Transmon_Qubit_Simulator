@@ -11,6 +11,11 @@
  *  - Eliminazione in avanti: si riduce il sistema in forma triangolare superiore
  *  - Sostituzione all’indietro: si risolve la triangolare ottenuta per ottenere le tensioni
  */
+#include "resistor.h"
+#include "generator.h"
+#include "circuito.h"
+#include "nodo.h"
+
 void risolvi_dc(CircuitoElettronico* c) {
     int n = c->nodo_count;
     double G[MAX_NODI][MAX_NODI] = {0};
