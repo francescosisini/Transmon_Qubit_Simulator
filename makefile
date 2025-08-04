@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -lm -I./src/include
 
 SRC = \
-	main.c \
+	src/main.c \
 	src/analisi_dc.c \
 	src/circuito.c \
 	src/nodo.c \
