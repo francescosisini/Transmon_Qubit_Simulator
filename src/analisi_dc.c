@@ -49,6 +49,20 @@ void risolvi_dc(CircuitoElettronico* c) {
     G[0][0] = 1.0;
     I[0] = 0.0;
 
+    // DEBUG: stampa G e I
+    printf("\nMatrice G:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%10.3e ", G[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\nVettore I:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%10.3e\n", I[i]);
+    }
+
     // Eliminazione in avanti (Gauss)
     for (int i = 0; i < n; i++) {
         for (int k = i + 1; k < n; k++) {
@@ -61,6 +75,11 @@ void risolvi_dc(CircuitoElettronico* c) {
 
     // Sostituzione all'indietro
     for (int i = n - 1; i >= 0; i--) {
+        if (fabs(G[i][i]) < 1e-12) {
+            printf("Errore: G[%d][%d] = 0, salto il nodo\n", i, i);
+            tensioni_nodi[i] = 0.0;
+            continue;
+        }
         tensioni_nodi[i] = I[i];
         for (int j = i + 1; j < n; j++) tensioni_nodi[i] -= G[i][j] * tensioni_nodi[j];
         tensioni_nodi[i] /= G[i][i];
