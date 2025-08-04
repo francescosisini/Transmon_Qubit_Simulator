@@ -1,5 +1,8 @@
-// transmon.c
 #include "transmon.h"
+#include "costanti_fisiche.h"
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 Transmon* crea_transmon(double C, double EJ, NodoElettrico* nodo_A, NodoElettrico* nodo_B) {
     Transmon* t = (Transmon*)malloc(sizeof(Transmon));
@@ -31,4 +34,4 @@ void stampa_transmon(const Transmon* t) {
     printf("  EC = %.3e J\n", t->EC);
     printf("  omega_q = %.3e rad/s\n", t->omega_q);
     printf("  alpha = %.3e rad/s\n", t->alpha);
-} 
+}
