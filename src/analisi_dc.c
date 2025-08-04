@@ -1,27 +1,22 @@
-// analisi_dc.c
-
+#include <math.h>
+#include <stdio.h>
 #include "analisi_dc.h"
-
-/**
- * Risolve il circuito in continua usando il metodo dei nodi:
- * Si costruisce la matrice G (conduttanza) e il vettore I (correnti iniettate).
- * Il sistema lineare G * V = I viene poi risolto con eliminazione di Gauss.
- *
- * Metodo di Gauss:
- *  - Eliminazione in avanti: si riduce il sistema in forma triangolare superiore
- *  - Sostituzione all’indietro: si risolve la triangolare ottenuta per ottenere le tensioni
- */
 #include "resistor.h"
 #include "generator.h"
 #include "circuito.h"
 #include "nodo.h"
 
+#define MAX_NODI 100
+
+static double tensioni_nodi[MAX_NODI] = {0};
+
 void risolvi_dc(CircuitoElettronico* c) {
-    int n = c->nodo_count;
+    int n = c->num_nodi;
     double G[MAX_NODI][MAX_NODI] = {0};
     double I[MAX_NODI] = {0};
 
-    for (int i = 0; i < c->resistor_count; i++) {
+    // Costruzione matrice di conduttanza G
+    for (int i = 0; i < c->num_resistors; i++) {
         Resistor* r = c->resistors[i];
         int a = r->nodoA->id;
         int b = r->nodoB->id;
@@ -36,7 +31,8 @@ void risolvi_dc(CircuitoElettronico* c) {
         }
     }
 
-    for (int i = 0; i < c->generatore_count; i++) {
+    // Correnti iniettate da generatori DC
+    for (int i = 0; i < c->num_generatori; i++) {
         Generatore* g = c->generatori[i];
         if (g->tipo != GENERATORE_DC) continue;
         int pos = g->nodo_pos->id;
@@ -46,6 +42,7 @@ void risolvi_dc(CircuitoElettronico* c) {
         if (neg >= 0) I[neg] -= v;
     }
 
+    // Eliminazione in avanti (Gauss)
     for (int i = 0; i < n; i++) {
         for (int k = i + 1; k < n; k++) {
             if (fabs(G[i][i]) < 1e-12) continue;
@@ -54,6 +51,8 @@ void risolvi_dc(CircuitoElettronico* c) {
             I[k] -= f * I[i];
         }
     }
+
+    // Sostituzione all'indietro
     for (int i = n - 1; i >= 0; i--) {
         tensioni_nodi[i] = I[i];
         for (int j = i + 1; j < n; j++) tensioni_nodi[i] -= G[i][j] * tensioni_nodi[j];
