@@ -11,8 +11,8 @@ int main() {
     CircuitoElettronico* circuito = crea_circuito();
 
     // Creazione nodi
-    NodoElettrico* massa = crea_nodo(0);
-    NodoElettrico* nodo1 = crea_nodo(1);
+    NodoElettrico* massa = crea_nodo(-1);
+    NodoElettrico* nodo1 = crea_nodo(0);
 
     aggiungi_nodo(circuito, massa);
     aggiungi_nodo(circuito, nodo1);
