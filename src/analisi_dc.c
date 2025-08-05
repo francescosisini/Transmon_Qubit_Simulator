@@ -11,6 +11,7 @@
 #define MAX_EQUAZIONI (MAX_NODI + 100)
 
 static double tensioni_nodi[MAX_NODI] = {0};
+static double correnti_generatori[100] = {0}; // Assumiamo massimo 100 generatori DC
 
 void risolvi_dc(CircuitoElettronico* c) {
     int n = c->num_nodi;
@@ -99,6 +100,9 @@ void risolvi_dc(CircuitoElettronico* c) {
 
     // Salva le tensioni nei nodi
     for (int i = 0; i < n; i++) tensioni_nodi[i] = x[i];
+
+    // Salva le correnti nei generatori
+    for (int k = 0; k < m; k++) correnti_generatori[k] = x[n + k];
 }
 
 double get_tensione_nodo(NodoElettrico* nodo) {
@@ -109,4 +113,11 @@ double get_corrente_resistenza(const Resistor* r) {
     double va = get_tensione_nodo(r->nodoA);
     double vb = get_tensione_nodo(r->nodoB);
     return (va - vb) / r->resistenza;
+}
+
+double get_corrente_generatore(const Generatore* g, CircuitoElettronico* c) {
+    for (int k = 0; k < c->num_generatori; k++) {
+        if (c->generatori[k] == g) return correnti_generatori[k];
+    }
+    return 0.0;
 }
