@@ -4,6 +4,7 @@
 #include "analisi_dc.h"
 #include "resistor.h"
 #include "generator.h"
+#include "capacitor.h"
 #include "circuito.h"
 #include "nodo.h"
 
@@ -36,6 +37,8 @@ void risolvi_dc(CircuitoElettronico* c) {
             if (a >= 0) A[b_][a] -= g;
         }
     }
+
+    // I condensatori non vengono inclusi nell'analisi DC, ma si potrebbero stampare
 
     // Gestione generatori di tensione ideali
     for (int k = 0; k < m; k++) {
