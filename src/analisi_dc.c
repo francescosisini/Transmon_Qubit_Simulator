@@ -106,6 +106,15 @@ void risolvi_dc(CircuitoElettronico* c) {
 
     // Salva le correnti nei generatori
     for (int k = 0; k < m; k++) correnti_generatori[k] = x[n + k];
+
+    // Stampa condensatori (solo a scopo informativo nella DC)
+    if (c->num_capacitors > 0) {
+        printf("\nCondensatori nel circuito:\n");
+        for (int i = 0; i < c->num_capacitors; i++) {
+            stampa_capacitor(c->capacitors[i]);
+        }
+    }
+
 }
 
 double get_tensione_nodo(NodoElettrico* nodo) {
