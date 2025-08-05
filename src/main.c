@@ -32,6 +32,8 @@ int main() {
     // Output
     printf("Tensione nodo1: %.2f V\n", get_tensione_nodo(nodo1));
     printf("Corrente nella resistenza: %.6f A\n", get_corrente_resistenza(res));
+    printf("Corrente nel generatore: %.6f A\n", get_corrente_generatore(gen, circuito));
+
 
     return 0;
 }
